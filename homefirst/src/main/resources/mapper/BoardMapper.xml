@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nehemiah.homedemo.repository.BoardMapper">
+
+    <!-- 결과 매핑 -->
+    <resultMap id="BoardResultMap" type="com.nehemiah.homedemo.entity.Board">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
+        <result property="isActive" column="is_active"/>
+        <result property="allowPinned" column="allow_pinned"/>
+        <result property="allowComment" column="allow_comment"/>
+        <result property="allowAttachment" column="allow_attachment"/>
+        <result property="allowCommentAttachment" column="allow_comment_attachment"/>
+        <result property="allowAnonymousPost" column="allow_anonymous_post"/>
+        <result property="boardType" column="board_type"/>
+        <result property="displayOrder" column="display_order"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedBy" column="updated_by"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <!-- 기본 컬럼 -->
+    <sql id="Base_Column_List">
+        id, name, description, is_active, allow_pinned, allow_comment, allow_attachment,
+        allow_comment_attachment, allow_anonymous_post, board_type, display_order,
+        created_by, created_at, updated_by, updated_at
+    </sql>
+
+    <!-- 게시판 목록 조회 -->
+    <select id="findAll" resultMap="BoardResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM boards
+        ORDER BY display_order ASC, created_at DESC
+    </select>
+
+    <!-- 활성화된 게시판 목록 조회 -->
+    <select id="findActiveBoards" resultMap="BoardResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM boards
+        WHERE is_active = true
+        ORDER BY display_order ASC, created_at DESC
+    </select>
+
+    <!-- ID로 게시판 조회 -->
+    <select id="findById" parameterType="long" resultMap="BoardResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM boards
+        WHERE id = #{id}
+    </select>
+
+    <!-- 이름으로 게시판 조회 -->
+    <select id="findByName" parameterType="string" resultMap="BoardResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM boards
+        WHERE name = #{name}
+    </select>
+
+    <!-- 게시판 타입으로 조회 -->
+    <select id="findByBoardType" parameterType="string" resultMap="BoardResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM boards
+        WHERE board_type = #{boardType}
+        ORDER BY display_order ASC
+    </select>
+
+    <!-- 게시판 저장 -->
+    <insert id="save" parameterType="com.nehemiah.homedemo.entity.Board" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO boards (
+            name, description, is_active, allow_pinned, allow_comment, allow_attachment,
+            allow_comment_attachment, allow_anonymous_post, board_type, display_order,
+            created_by, created_at, updated_by, updated_at
+        ) VALUES (
+            #{name}, #{description}, #{isActive}, #{allowPinned}, #{allowComment}, #{allowAttachment},
+            #{allowCommentAttachment}, #{allowAnonymousPost}, #{boardType}, #{displayOrder},
+            #{createdBy}, NOW(), #{updatedBy}, NOW()
+        )
+    </insert>
+
+    <!-- 게시판 수정 -->
+    <update id="update" parameterType="com.nehemiah.homedemo.entity.Board">
+        UPDATE boards SET
+            name = #{name},
+            description = #{description},
+            is_active = #{isActive},
+            allow_pinned = #{allowPinned},
+            allow_comment = #{allowComment},
+            allow_attachment = #{allowAttachment},
+            allow_comment_attachment = #{allowCommentAttachment},
+            allow_anonymous_post = #{allowAnonymousPost},
+            board_type = #{boardType},
+            display_order = #{displayOrder},
+            updated_by = #{updatedBy},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 게시판 삭제 -->
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM boards WHERE id = #{id}
+    </delete>
+
+    <!-- 게시판 존재 여부 확인 -->
+    <select id="existsByName" parameterType="string" resultType="boolean">
+        SELECT COUNT(*) > 0 FROM boards WHERE name = #{name}
+    </select>
+
+</mapper> 
