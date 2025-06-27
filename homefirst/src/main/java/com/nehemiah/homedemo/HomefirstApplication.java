@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class HomefirstApplication {
 
 	public static void main(String[] args) {
-		
+		//테스트
 		SpringApplication.run(HomefirstApplication.class, args);
 	}
 
